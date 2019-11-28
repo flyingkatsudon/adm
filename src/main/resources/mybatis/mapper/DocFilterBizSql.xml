@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bdp.adm.dao.DocFilterDAO" >
+	<!-- SelectAll Query -->
+	<select id="selectAllDocFilter" parameterType="map" resultType="com.bdp.adm.vo.DocFilterVO">
+		SELECT 'row_' || rank() over (ORDER BY filter_idx ASC, business_code ASC, meta_concept ASC, filter_word ASC, and_word ASC, not_word ASC, version ASC) AS "DT_RowId", *
+		FROM std.doc_filter_info
+		<if test='!bCode.equals("SY")'>WHERE business_code=#{bCode} OR business_code='CM'</if>
+		ORDER BY
+			<if test="action == null">update_date is null, update_date DESC</if>
+			<if test='action != null and action.equals("remove")'>update_date is null, update_date DESC</if>
+			<if test='action != null and action.equals("create")'>load_date DESC</if>
+			<if test='action != null and action.equals("edit")'>update_date is null, update_date DESC</if>
+	</select>
+	
+	<!-- SelectOne Query -->
+	<select id="selectOneDocFilter" parameterType="String" resultType="com.bdp.adm.vo.DocFilterVO">
+		SELECT * FROM
+		(SELECT 'row_' || rank() over (ORDER BY update_date DESC, load_date DESC) AS "DT_RowId", * FROM std.doc_filter_info WHERE NOT del_cd='X' OR del_cd is null) as tempTable
+		WHERE "DT_RowId"=#{DT_RowId}
+	</select>
+	
+	<!-- Insert Query -->
+	<insert id="insertDocFilter" parameterType="com.bdp.adm.vo.DocFilterVO">
+		INSERT INTO std.doc_filter_info(business_code, category_code, level,  meta_concept, filter_word, and_word, not_word, version, load_date, load_name)
+		VALUES(#{businessCode},#{categoryCode}, #{level},  #{metaConcept},  #{filterWord}, #{andWord}, #{notWord}, #{version}, now(), #{loadName})
+	</insert>
+	
+	<!-- Update Query -->
+	<update id="updateDocFilter" parameterType="com.bdp.adm.vo.DocFilterVO">
+		UPDATE
+			std.doc_filter_info
+		SET
+			<if test="businessCode != null"> 
+			business_code=#{businessCode},
+			</if>
+			<if test="categoryCode != null"> 
+			category_code=#{categoryCode},
+			</if>
+			<if test="level != null"> 
+			level=#{level},
+			</if>
+			<if test="metaConcept != null"> 
+			meta_concept=#{metaConcept},
+			</if>
+			<if test="filterWord != null"> 
+			filter_word=#{filterWord},
+			</if>
+			<if test="andWord != null"> 
+			and_word=#{andWord},
+			</if>
+			<if test="notWord != null"> 
+			not_word=#{notWord},
+			</if>
+			<if test="delCd != null"> 
+			del_cd=#{delCd},
+			</if>
+			<if test="version != null"> 
+			version=#{version},
+			</if>
+			update_date=now(), update_name=#{updateName}		
+		WHERE
+			filter_idx=#{filterIdx}
+	</update>
+	
+	<!-- Delete Query -->
+	<delete id="deleteDocFilter" parameterType="com.bdp.adm.vo.DocFilterVO">
+		UPDATE std.doc_filter_info
+		SET del_cd='X', update_date=now(), update_name=#{updateName}
+		WHERE filter_idx=#{filterIdx}
+	</delete>
+	
+</mapper>

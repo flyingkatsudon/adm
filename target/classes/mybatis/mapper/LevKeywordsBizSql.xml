@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdp.adm.dao.LevKeywordsDAO" >
+	<!-- Select Query -->
+	<select id="selectAllLevKeywords" parameterType="String" resultType="com.bdp.adm.vo.LevKeywordsVO">
+		SELECT 'row_' || rank() over (ORDER BY seq_keyword ASC) as "DT_RowId", *
+		FROM std.lev_keywords_std_info
+		<!-- WHERE NOT del_cd='X' OR del_cd IS NULL -->
+		ORDER BY
+			<if test='_parameter == null or _parameter.equals("remove")'>update_date is null, update_date DESC</if>
+			<if test='_parameter != null and _parameter.equals("create")'>load_date is null, load_date DESC</if>
+			<if test='_parameter != null and _parameter.equals("edit")'>update_date is null, update_date DESC</if>
+	</select>
+	
+	<!-- Insert Query -->
+	<insert id="insertLevKeywords" parameterType="com.bdp.adm.vo.LevKeywordsVO">
+		INSERT INTO std.lev_keywords_std_info(level_1, level_2, level_3, keyword_1, keyword_2, keyword_3, keyword_4, keyword_5, keyword_6, keyword_7, keyword_8, keyword_9, keyword_10, keyword_11, keyword_12, keyword_13, keyword_14, keyword_15, load_date, load_name) 
+		VALUES(#{level1}, #{level2}, #{level3}, #{keyword1}, #{keyword2}, #{keyword3}, #{keyword4}, #{keyword5}, #{keyword6}, #{keyword7}, #{keyword8}, #{keyword9}, #{keyword10}, #{keyword11}, #{keyword12}, #{keyword13}, #{keyword14}, #{keyword15}, now(), #{loadName})
+	</insert>
+	
+	<!-- Update Query -->
+	<update id="updateLevKeywords" parameterType="com.bdp.adm.vo.LevKeywordsVO">
+		UPDATE
+			std.lev_keywords_std_info
+		SET
+			<if test="level1 != null">level_1=#{level1},</if>
+			<if test="level2 != null">level_2=#{level2},</if>
+			<if test="level3 != null">level_3=#{level3},</if>
+			<if test="keyword1 != null">keyword_1=#{keyword1},</if>
+			<if test="keyword2 != null">keyword_2=#{keyword2},</if>
+			<if test="keyword3 != null">keyword_3=#{keyword3},</if>
+			<if test="keyword4 != null">keyword_4=#{keyword4},</if>
+			<if test="keyword5 != null">keyword_5=#{keyword5},</if>
+			<if test="keyword6 != null">keyword_6=#{keyword6},</if>
+			<if test="keyword7 != null">keyword_7=#{keyword7},</if>
+			<if test="keyword8 != null">keyword_8=#{keyword8},</if>
+			<if test="keyword9 != null">keyword_9=#{keyword9},</if>
+			<if test="keyword10 != null">keyword_10=#{keyword10},</if>
+			<if test="keyword11 != null">keyword_11=#{keyword11},</if>
+			<if test="keyword12 != null">keyword_12=#{keyword12},</if>
+			<if test="keyword13 != null">keyword_13=#{keyword13},</if>
+			<if test="keyword14 != null">keyword_14=#{keyword14},</if>
+			<if test="keyword15 != null">keyword_15=#{keyword15},</if>
+			<if test="delCd != null">del_cd=#{delCd},</if>
+			update_date=now(), update_name=#{updateName}
+		WHERE
+			seq_keyword=#{seqKeyword}
+	</update>
+	
+	<!-- Delete Query -->
+	<delete id="deleteLevKeywords" parameterType="com.bdp.adm.vo.LevKeywordsVO">
+		UPDATE std.lev_keywords_std_info
+		SET del_cd='X', update_date=now(), update_name=#{updateName}
+		WHERE seq_keyword=#{seqKeyword}
+	</delete>
+	
+</mapper>

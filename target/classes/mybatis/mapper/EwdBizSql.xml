@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bdp.adm.dao.EwdDAO" >
+	<!-- SelectAll Query -->
+	<select id="selectAllEwd" parameterType="map" resultType="com.bdp.adm.vo.EwdVO">
+		SELECT 'row_' || rank() over (ORDER BY synset_id ASC, word_id ASC, business_code ASC) AS "DT_RowId", *
+		FROM std.ewd_info
+		<if test='!bCode.equals("SY")'>WHERE business_code=#{bCode} OR business_code='CM'</if>
+		ORDER BY
+			<if test="action == null">update_date is null, update_date DESC</if>
+			<if test='action != null and action.equals("remove")'>update_date is null, update_date DESC</if>
+			<if test='action != null and action.equals("create")'>load_date DESC</if>
+			<if test='action != null and action.equals("edit")'>update_date is null, update_date DESC</if>
+	</select>
+	
+	<!-- SelectOne Query -->
+	<select id="selectOneEwd" parameterType="String" resultType="com.bdp.adm.vo.EwdVO">
+		SELECT * FROM
+		(SELECT 'row_' || rank() over (ORDER BY synset_id ASC, word_id ASC, business_code ASC) AS "DT_RowId", * FROM std.ewd_info) as tempTable
+		WHERE "DT_RowId"=#{DT_RowId}
+	</select>
+	
+	<!-- Insert Query -->
+	<insert id="insertEwd" parameterType="com.bdp.adm.vo.EwdVO">
+		INSERT INTO std.ewd_info(synset_id, word_id, business_code, word, pos_info, attribute_info, proto_info, domain_info, ontology_info, polarity, pre_val, weight, z_val, s_val, version, load_date, load_name)
+		VALUES(#{synsetId}, #{wordId}, #{businessCode}, #{word}, #{posInfo}, #{attributeInfo}, #{protoInfo}, #{domainInfo}, #{ontologyInfo}, #{polarity}, #{preVal}, #{weight}, #{zVal}, #{sVal}, #{version}, now(), #{loadName})
+	</insert>
+	
+	<!-- Update Query -->
+	<update id="updateEwd" parameterType="com.bdp.adm.vo.EwdVO">
+		UPDATE
+			std.ewd_info
+		SET
+			<if test="synsetId != null"> 
+			synset_id=#{synsetId},
+			</if>
+			<if test="wordId != null"> 
+			word_id=#{wordId},
+			</if>
+			<if test="businessCode != null"> 
+			business_code=#{businessCode},
+			</if>
+			<if test="word != null"> 
+			word=#{word},
+			</if>
+			<if test="posInfo != null"> 
+			pos_info=#{posInfo},
+			</if>
+			<if test="attributeInfo != null"> 
+			attribute_info=#{attributeInfo},
+			</if>
+			<if test="domainInfo != null"> 
+			domain_info=#{domainInfo},
+			</if>
+			<if test="ontologyInfo != null"> 
+			ontology_info=#{ontologyInfo},
+			</if>
+			<if test="polarity != null"> 
+			polarity=#{polarity},
+			</if>
+			<if test="delCd != null"> 
+			del_cd=#{delCd},
+			</if>
+			<if test="version != null"> 
+			version=#{version},
+			</if>
+		    update_date=now(), update_name=#{updateName}
+		WHERE
+			ewd_idx=#{ewdIdx}
+	</update>
+	
+	<!-- Delete Query -->
+	<delete id="deleteEwd" parameterType="com.bdp.adm.vo.EwdVO">
+		UPDATE std.ewd_info
+		SET del_cd='X', update_date=now(), update_name=#{updateName}
+		WHERE ewd_idx=#{ewdIdx}
+	</delete>
+	
+</mapper>

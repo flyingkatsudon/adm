@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdp.adm.dao.UserRoleDAO">
+	<!-- Select Query -->
+	<select id="selectAllUserRole" parameterType="map" resultType="com.bdp.adm.vo.UserRoleVO">
+		SELECT
+		RESULT.*, r.role_name
+		FROM
+			(
+				SELECT p.*, CONCAT('row_', @Rank := @Rank + 1) as DT_RowId
+				FROM cboard_demo.dashboard_user_role p, (SELECT @Rank := 0) r
+				<if test='!bCode.equals("SY")'>WHERE business_code = #{bCode}</if>
+			) RESULT
+		
+			, cboard_demo.`dashboard_role` as r
+		WHERE
+			RESULT.role_id = r.role_id
+		ORDER BY 
+			<if test="action == null">RESULT.load_date DESC, RESULT.load_time DESC</if>
+			<if test='action != null and action.equals("remove")'>RESULT.update_date DESC, RESULT.update_time DESC</if>
+			<if test='action != null and action.equals("create")'>RESULT.load_date DESC, RESULT.load_time DESC</if>
+			<if test='action != null and action.equals("edit")'>RESULT.update_date DESC, RESULT.update_time DESC</if>
+	</select>
+	
+	<!-- Select One Query -->
+	<select id="selectOneUserRole" parameterType="String" resultType="com.bdp.adm.vo.UserRoleVO">
+		SELECT * 
+		FROM (SELECT p.*, CONCAT('row_', @Rank := @Rank + 1) as DT_RowId FROM cboard_demo.dashboard_user_role p, (SELECT @Rank := 0) r ORDER BY user_role_id ASC, user_id ASC, role_id ASC) AS tempTable
+		WHERE DT_RowId=#{DT_RowId}
+	</select>
+	
+	<!-- Insert Query -->
+	<insert id="insertUserRole" parameterType="com.bdp.adm.vo.UserRoleVO">
+		INSERT INTO cboard_demo.dashboard_user_role(user_id, role_id, business_code, load_date, load_time, load_name) 
+		VALUES(#{userId}, '3', #{businessCode}, now(), now(), #{loadName})
+	</insert>
+	
+	<!-- Update Query -->
+	<update id="updateUserRole" parameterType="com.bdp.adm.vo.UserRoleVO">
+		UPDATE
+			cboard_demo.dashboard_user_role
+		SET
+			<if test="roleId != null">role_id=#{roleId},</if>
+			<if test="businessCode != null">business_code=#{businessCode},</if>
+			<if test="delCd != null">del_cd=#{delCd},</if>
+			update_date=now(), update_time=now(), update_name=#{updateName}
+		WHERE
+			user_role_id=#{userRoleId}
+	</update>
+	
+	<!-- Delete Query -->
+	<delete id="deleteUserRole" parameterType="com.bdp.adm.vo.UserRoleVO">
+		UPDATE cboard_demo.dashboard_user_role
+		SET del_cd='X', update_date=now(), update_time=now(), update_name=#{updateName}
+		WHERE user_role_id=#{userRoleId}
+	</delete>
+</mapper>

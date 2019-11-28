@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdp.adm.dao.TknDictDAO" >
+	<!-- SelectAll Query -->
+	<select id="selectAllTknDict" resultType="com.bdp.adm.vo.TknDictVO">
+		SELECT 'row_' || rank() over(ORDER BY word_id ASC, word ASC, business_code ASC, version ASC) AS "DT_RowId", *
+		FROM dw.tkn_dict_info
+		WHERE NOT del_cd='X'
+	</select>
+	
+	<!-- SelectOne Query -->
+	<select id="selectOneTknDict" parameterType="String" resultType="com.bdp.adm.vo.TknDictVO">
+		SELECT * FROM
+		(SELECT 'row_' || rank() over(ORDER BY word_id ASC, word ASC, business_code ASC, version ASC) AS "DT_RowId", * FROM dw.tkn_dict_info WHERE NOT del_cd='X') as tempTable
+		WHERE "DT_RowId"=#{DT_RowId};
+	</select>
+	
+	<!-- Insert Query -->
+	<insert id="insertTknDict" parameterType="com.bdp.adm.vo.TknDictVO">
+		INSERT INTO dw.tkn_dict_info(word_id, word, business_code, left_idx, right_idx, cost, pos_info, ner_info, fin_syllable, alias_list, cmpnd_info, add_info1, add_info2, cmpnd_summary, cmpnd_detail, version, load_date, update_date)
+		VALUES(#{wordId}, #{word}, #{businessCode}, #{leftIdx}, #{rightIdx}, #{cost}, #{posInfo}, #{nerInfo}, #{finSyllable}, #{aliasList}, #{cmpndInfo}, #{addInfo1}, #{addInfo2}, #{cmpndSummary}, #{cmpndDetail}, #{version}, now(), now())
+	</insert>
+	
+	<!-- Update Query -->
+	<update id="updateTknDict" parameterType="com.bdp.adm.vo.TknDictVO">
+		UPDATE dw.tkn_dict_info
+		SET word_id=#{wordId}, word=#{word}, business_code=#{businessCode}, left_idx=#{leftIdx}, right_idx=#{rightIdx}, cost=#{cost}, pos_info=#{posInfo}, ner_info=#{nerInfo}, fin_syllable=#{finSyllable}, alias_list=#{aliasList}, cmpnd_info=#{cmpndInfo}, add_info1=#{addInfo1}, add_info2=#{addInfo2}, cmpnd_summary=#{cmpndSummary}, cmpnd_detail=#{cmpndDetail}, version=#{version}, update_date=now() 
+		WHERE word_id=#{oldWordId} AND word=#{oldWord} AND business_code=#{oldBusinessCode} AND version=#{oldVersion}
+	</update>
+	
+	<!-- Delete Query -->
+	<delete id="deleteTknDict" parameterType="com.bdp.adm.vo.TknDictVO">
+		UPDATE dw.tkn_dict_info
+		SET del_cd='X'
+		WHERE word_id=#{wordId} AND word=#{word} AND business_code=#{businessCode} AND version=#{version}
+	</delete>
+	
+</mapper>

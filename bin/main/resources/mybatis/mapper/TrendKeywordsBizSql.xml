@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdp.adm.dao.TrendKeywordsDAO" >
+	<!-- Select Query -->
+	<select id="selectAllTrendKeywords" parameterType="map" resultType="com.bdp.adm.vo.TrendKeywordsVO">
+		SELECT 'row_' || rank() over (ORDER BY business_code ASC, keyword ASC, registrant_info ASC, version ASC) as "DT_RowId", *
+		FROM std.trend_keywords_std_info
+		<if test='!bCode.equals("SY")'>WHERE business_code=#{bCode} OR business_code='CM'</if>
+	    ORDER BY
+			<if test="action == null">update_date is null, update_date DESC</if>
+			<if test='action != null and action.equals("remove")'>update_date is null, update_date DESC</if>
+			<if test='action != null and action.equals("create")'>load_date DESC</if>
+			<if test='action != null and action.equals("edit")'>update_date is null, update_date DESC</if>	
+	</select>
+	
+	<!-- Select One Query -->
+	<select id="selectOneTrendKeywords" parameterType="String" resultType="com.bdp.adm.vo.TrendKeywordsVO">
+		SELECT * FROM
+		(SELECT 'row_' || rank() over (ORDER BY business_code ASC, keyword ASC, registrant_info ASC, version ASC) as "DT_RowId", * FROM std.trend_keywords_std_info) as tempTable
+		WHERE "DT_RowId"=#{DT_RowId}
+	</select>
+	
+	<!-- Insert Query -->
+	<insert id="insertTrendKeywords" parameterType="com.bdp.adm.vo.TrendKeywordsVO">
+		INSERT INTO std.trend_keywords_std_info(business_code, keyword, registrant_info, version, load_date, load_name) 
+		VALUES(#{businessCode}, #{keyword}, #{registrantInfo}, #{version}, now(), #{loadName})
+	</insert>
+	
+	<!-- Update Query -->
+	<update id="updateTrendKeywords" parameterType="com.bdp.adm.vo.TrendKeywordsVO">
+		UPDATE
+			std.trend_keywords_std_info
+		SET
+			<if test="businessCode != null">
+		 	business_code=#{businessCode},
+			</if>
+			<if test="keyword != null">
+		 	keyword=#{keyword},
+			</if>
+			<if test="registrantInfo != null">
+		 	registrant_info=#{registrantInfo},
+			</if>
+			<if test="delCd != null">
+		 	del_cd=#{delCd},
+			</if>
+			<if test="version != null">
+		 	version=#{version},
+			</if>
+			update_date=now(), update_name=#{updateName}
+		WHERE
+			trend_keywords_idx=#{trendKeywordsIdx}
+	</update>
+	
+	<!-- Delete Query -->
+	<delete id="deleteTrendKeywords" parameterType="com.bdp.adm.vo.TrendKeywordsVO">
+		UPDATE std.trend_keywords_std_info
+		SET del_cd='X', update_date=now(), update_name=#{updateName}
+		WHERE trend_keywords_idx=#{trendKeywordsIdx}
+	</delete>
+	
+</mapper>

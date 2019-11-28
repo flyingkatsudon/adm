@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdp.adm.dao.StopwordDAO" >
+	<!-- Select Query -->
+	<select id="selectAllStopword" parameterType="map" resultType="com.bdp.adm.vo.StopwordVO">
+		SELECT 'row_' || rank() over (ORDER BY keyword_id ASC, business_code ASC, category_code ASC, registrant_info ASC, version ASC) as "DT_RowId", *
+		FROM std.stopword_info
+		<if test='!bCode.equals("SY")'>WHERE business_code=#{bCode} OR business_code='CM'</if>
+		ORDER BY
+			<if test="action == null">update_date is null, update_date DESC</if>
+			<if test='action != null and action.equals("remove")'>update_date is null, update_date DESC</if>
+			<if test='action != null and action.equals("create")'>load_date DESC</if>
+			<if test='action != null and action.equals("edit")'>update_date is null, update_date DESC</if>	
+	</select>
+	
+	<!-- Select One Query -->
+	<select id="selectOneStopword" parameterType="String" resultType="com.bdp.adm.vo.StopwordVO">
+		SELECT * FROM
+		(SELECT 'row_' || rank() over (ORDER BY update_date DESC, load_date DESC) as "DT_RowId", * FROM std.stopword_info WHERE NOT del_cd='X' OR del_cd is null) as tempTable
+		WHERE "DT_RowId"=#{DT_RowId}
+	</select>
+	
+	<!-- Insert Query -->
+	<insert id="insertStopword" parameterType="com.bdp.adm.vo.StopwordVO">
+		INSERT INTO std.stopword_info(business_code, category_code, stop_type, keyword, registrant_info, version, load_date, load_name) 
+		VALUES(#{businessCode}, #{categoryCode}, #{stopType}, #{keyword}, #{registrantInfo}, #{version}, now(), #{loadName})
+	</insert>
+	
+	<!-- Update Query -->
+	<update id="updateStopword" parameterType="com.bdp.adm.vo.StopwordVO">
+		UPDATE
+			std.stopword_info
+		SET
+			<if test="businessCode != null">business_code=#{businessCode},</if>
+			<if test="categoryCode != null">category_code=#{categoryCode},</if>
+			<if test="keyword != null">keyword=#{keyword},</if>
+			<if test="registrantInfo != null">registrant_info=#{registrantInfo},</if>
+			<if test="delCd != null">del_cd=#{delCd},</if>
+			<if test="stopType != null">stop_type=#{stopType},</if>
+			<if test="version != null">version=#{version},</if>
+			update_date=now(), update_name=#{updateName}
+		WHERE keyword_id=#{keywordId}
+	</update>
+	
+	<!-- Delete Query -->
+	<delete id="deleteStopword" parameterType="com.bdp.adm.vo.StopwordVO">
+		UPDATE std.stopword_info
+		SET del_cd='X', update_date=now(), update_name=#{updateName}
+		WHERE keyword_id=#{keywordId}
+	</delete>
+	
+</mapper>

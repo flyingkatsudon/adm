@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:b="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/security 
+						http://www.springframework.org/schema/security/spring-security.xsd">
+	
+	<http pattern="/process" entry-point-ref="BDPAuthenticationEntryPoint">
+		<custom-filter position="FORM_LOGIN_FILTER" ref="BDPAuthenticationFilter" />
+        <csrf disabled="true"/>
+	</http>
+	
+	<http>
+		<intercept-url pattern="/view/user/**" access="hasAuthority('1')" />
+		<intercept-url pattern="/view/dict/**" access="hasAuthority('1') or hasAuthority('2')" />
+		<intercept-url pattern="/view/**" access="isAuthenticated()" />
+		<intercept-url pattern="/**" access="permitAll" />
+		
+		<form-login 
+			login-page="/" 
+			login-processing-url="/process"
+			username-parameter="username" 
+			password-parameter="password"
+			default-target-url="/starter.jsp" 
+			authentication-success-handler-ref="LoginSuccessHandler"
+			authentication-failure-handler-ref="loginFailureHandler"
+		/>
+			
+        <logout
+			logout-url="/logout"
+			success-handler-ref="logoutHandler" />
+        <!-- <remember-me remember-me-parameter="remember_me"/> -->
+        <!-- <csrf disabled="false"/> -->
+	</http>
+	    
+	    <b:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
+	    	<b:constructor-arg name="strength" value="256"/>
+	    </b:bean>
+	    
+		<authentication-manager alias="authenticationManager">
+	        <authentication-provider ref="authenticationProvider"/>
+	    </authentication-manager>
+	    
+		<!-- <b:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/> -->
+	    
+	    <b:bean id="authenticationProvider" class="com.bdp.adm.security.authentication.BDPAuthenticationProvider"/>
+	    <!-- <b:bean id="userDetailsService" class="com.bdp.adm.biz.impl.UserBizImpl"/> -->
+	    
+	    <b:bean id="LoginSuccessHandler" class="com.bdp.adm.security.handler.LoginSuccessHandler"/>	    
+	    <b:bean id="loginFailureHandler" class="com.bdp.adm.security.handler.LoginFailureHandler"/>
+	    
+	    <b:bean id="logoutHandler" class="com.bdp.adm.security.handler.LogoutSuccessHandler"/>
+	          
+		<b:bean id="BDPAuthenticationEntryPoint" class="com.bdp.adm.security.authentication.BDPAuthenticationEntryPoint"/>
+		<b:bean id="BDPAuthenticationFilter" class="com.bdp.adm.security.authentication.BDPAuthenticationFilter">
+			<b:property name="authenticationManager" ref="authenticationManager"/>
+		</b:bean>
+</b:beans>

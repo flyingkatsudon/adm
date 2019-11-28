@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdp.adm.dao.UserDAO">
+	<!-- Select Query -->
+	<select id="selectAllUser" parameterType="map" resultType="com.bdp.adm.vo.UserVO">
+	SELECT 
+		RESULT.*, dn.user_dept_name, tn.user_title_name, sn.user_status_name 
+	FROM
+		(
+			SELECT p.*, CONCAT('row_', @Rank := @Rank + 1) as DT_RowId
+			FROM dashboard_user p , (SELECT @Rank := 0) r
+			<if test='!bCode.equals("SY")'>WHERE business_code = #{bCode}</if>
+		) RESULT
+		, cboard_demo.`MT.Master_Dept_Name_v2` as dn
+		, cboard_demo.`MT.Master_Title_Name_v2` as tn
+		, cboard_demo.`MT.Master_Status_Name_v2` as sn
+	WHERE 
+		RESULT.user_dept_cd = dn.user_dept_cd
+	    and RESULT.user_title_cd = tn.user_title_cd
+	    and RESULT.user_status = sn.user_status_cd
+	    ORDER BY
+	    	<if test="action == null">RESULT.load_date DESC, RESULT.load_time DESC</if>
+			<if test='action != null and action.equals("remove")'>RESULT.update_date DESC, RESULT.update_time DESC</if>
+			<if test='action != null and action.equals("create")'>RESULT.load_date DESC, RESULT.load_time DESC</if>
+			<if test='action != null and action.equals("edit")'>RESULT.update_date DESC, RESULT.update_time DESC</if>
+			<if test='action != null and action.equals("initUserStat")'>RESULT.update_date DESC, RESULT.update_time DESC</if>
+	</select>
+	
+	<!-- Select One Query -->
+	<select id="selectOneUser" parameterType="String" resultType="com.bdp.adm.vo.UserVO">
+		SELECT * 
+		FROM (SELECT p.*, CONCAT('row_', @Rank := @Rank + 1) as DT_RowId FROM dashboard_user p, (SELECT @Rank := 0) r WHERE NOT del_cd = 'X' ORDER BY user_id ASC, business_code ASC) AS tempTable
+		WHERE DT_RowId=#{DT_RowId}
+	</select>
+	
+	<!-- Insert Query -->
+	<insert id="insertUser" parameterType="com.bdp.adm.vo.UserVO">
+		INSERT INTO cboard_demo.dashboard_user(user_id, business_code, user_name, user_password, user_title_cd, user_dept_cd, user_status, user_last_date, user_start_date, user_end_date, load_date, load_time, load_name) 
+		VALUES(#{userId}, #{businessCode}, #{userName}, #{userPassword}, #{userTitleCd}, #{userDeptCd}, #{userStatus}, #{userLastDate}, #{userStartDate}, #{userEndDate}, now(), now(), #{loadName})
+	</insert>
+	
+	<!-- Update Query -->
+	<update id="updateUser" parameterType="com.bdp.adm.vo.UserVO">
+      UPDATE 
+      	cboard_demo.dashboard_user
+      SET  
+      <if test="businessCode != null"> 
+         business_code=#{businessCode},
+      </if>  	
+      <if test="username != null"> 
+         user_name=#{username}, 
+      </if>
+      <if test="userTitleCd != null"> 
+         user_title_cd=#{userTitleCd}, 
+      </if>
+      <if test="userDeptCd != null"> 
+         user_dept_cd=#{userDeptCd}, 
+      </if>
+      <if test="userStatus != null"> 
+         user_status=#{userStatus}, 
+      </if>
+      <if test="delCd != null"> 
+         del_cd=#{delCd}, 
+      </if>
+      <if test="userStartDate != null"> 
+         user_start_date=#{userStartDate}, 
+      </if>
+      <if test="userEndDate != null"> 
+         user_end_date=#{userEndDate}, 
+      </if>
+         update_date=NOW(), 
+         update_time=NOW(),
+         update_name=#{updateName}
+      WHERE 
+         user_id= #{userId} AND business_code=#{businessCode}
+	</update>
+	
+	<!-- Delete Query -->
+	<delete id="deleteUser" parameterType="com.bdp.adm.vo.UserVO">
+		UPDATE cboard_demo.dashboard_user
+		SET del_cd='X', update_date=now(), update_time=now(), update_name=#{updateName}
+		WHERE user_id=#{userId} AND business_code=#{businessCode}
+	</delete>
+	
+	<!-- Update Query: InitUserStat -->
+	<delete id="initUserStat" parameterType="com.bdp.adm.vo.UserVO">
+		UPDATE cboard_demo.dashboard_user
+		SET rbac_policy=0, user_state_info="0", user_password=#{userPassword}, update_date=now(), update_time=now(), update_name=#{updateName}
+		WHERE user_id=#{userId} AND business_code=#{businessCode}
+	</delete>
+	
+	
+	<!-- security -->
+	 <select id="getUser" parameterType="com.bdp.adm.vo.UserVO" resultType="com.bdp.adm.vo.UserVO">
+		select u.user_id userId, u.user_password userPassword, u.business_code businessCode
+    		, u.login_name, u.user_name userName
+    		, CONCAT(u.business_code, u.user_id) uniqueHash
+    		, u.rbac_policy rbacPolicy, u.user_state_info userStateInfo
+			, ur.role_id
+			, u.del_cd delCd
+		FROM dashboard_user u
+		INNER JOIN dashboard_user_role ur ON u.user_id = ur.user_id AND u.business_code = ur.business_code
+		where u.user_id=#{param.userId} and u.business_code=#{param.businessCode}
+    </select>
+    
+    <select id="getScreenList" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT 
+				msm.screen_no screenNo
+				, msm.screen_program_id screenProgramId
+				, msm.screen_layout_txt screenLayoutTxt
+		FROM 
+			`MT.Master_Screen_link` msl
+		INNER JOIN `MT.Master_Screen_Master` msm
+			ON msm.screen_no = msl.screen_no
+		WHERE msl.res_type IN (
+				SELECT rr.res_type
+				FROM 
+					dashboard_user_role ur
+				INNER JOIN dashboard_role_res rr
+					ON rr.role_id = ur.role_id
+				WHERE ur.role_id=#{roleId})
+		AND (msl.del_cd != 'x' OR msl.del_cd != 'X')
+    </select>
+
+    <update id="updatePwd" parameterType="com.bdp.adm.vo.UserVO">
+		UPDATE cboard_demo.dashboard_user u SET u.user_password = #{param.userPassword}
+		WHERE u.user_id=#{param.userId} and u.business_code = #{param.businessCode} AND u.user_password = #{param.oldUserPassword}
+    </update>
+    
+    <update id="updateLoginCnt" parameterType="com.bdp.adm.vo.UserVO">
+		UPDATE cboard_demo.dashboard_user u SET u.rbac_policy = #{param.rbacPolicy}, u.user_state_info = #{param.userStateInfo}, u.user_last_date = now()
+		WHERE u.user_id=#{param.userId} and u.business_code = #{param.businessCode}
+    </update>
+    
+    <!-- getMetaInfo -->
+    <select id="selectUserTitle" resultType="com.bdp.adm.vo.UserMetaVO">
+		SELECT user_title_cd, user_title_name FROM cboard_demo.`MT.Master_Title_Name_v2` WHERE NOT del_cd='X'
+	</select>
+	
+	<select id="selectUserDept" resultType="com.bdp.adm.vo.UserMetaVO">
+		select user_dept_cd, user_dept_name from cboard_demo.`MT.Master_Dept_Name_v2` WHERE NOT del_cd='X'
+	</select>
+	
+	<select id="selectUserStatus" resultType="com.bdp.adm.vo.UserMetaVO">
+		SELECT user_status_cd, user_status_name FROM cboard_demo.`MT.Master_Status_Name_v2` WHERE NOT del_cd='X'
+	</select>
+	
+</mapper>

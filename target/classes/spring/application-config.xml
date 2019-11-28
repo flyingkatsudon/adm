@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    
+    <!-- Uncomment and add your base-package here:
+         <context:component-scan
+            base-package="org.springframework.samples.service"/>  -->
+    
+    <!-- Session Manage -->
+    <!-- <bean id="sessionManageBizImpl" class="com.bdp.adm.biz.impl.SessionManageBizImpl" scope="singleton"/> -->
+    <bean id="sessionManageBizImpl" class="com.bdp.adm.biz.impl.SessionManageBizImpl" scope="singleton"/>
+    <bean id="checkPwd" class="com.bdp.adm.util.CheckPwd"/>
+	
+	<!-- ADDED BY DONGWOOK -->
+	<!-- 0. Excel Upload -->
+	<!-- 0.1. User -->
+ 	<bean id="commonBizImpl" class="com.bdp.adm.biz.impl.CommonBizImpl"/>
+ 	<bean id="commonDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.CommonDAO"/>
+ 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- 0.2. Dict -->
+ 	<bean id="commonDictBizImpl" class="com.bdp.adm.biz.impl.CommonDictBizImpl"/>
+ 	<bean id="commonDictDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.CommonDictDAO"/>
+ 		<property name="sqlSessionFactory" ref="postgreSqlSessionFactory"/>
+ 	</bean>
+ 	
+	<!-- 1. USER -->
+	<!-- 1.1. User -->
+ 	<bean id="userBizImpl" class="com.bdp.adm.biz.impl.UserBizImpl"/>
+ 	<bean id="userBizDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.UserDAO"/>
+ 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- 1.2. Role -->
+ 	<bean id="roleBizImpl" class="com.bdp.adm.biz.impl.RoleBizImpl"/>
+ 	<bean id="roleDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.RoleDAO"/>
+ 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- 1.3. RoleRes-->
+ 	<bean id="roleResBizImpl" class="com.bdp.adm.biz.impl.RoleResBizImpl"/>
+ 	<bean id="roleResDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.RoleResDAO"/>
+ 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- 1.4. UserRole-->
+	<bean id="userRoleBizImpl" class="com.bdp.adm.biz.impl.UserRoleBizImpl"/>
+ 	<bean id="userRoleDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.UserRoleDAO"/>
+ 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- 1.5. ScreenMaster-->
+	<bean id="screenMasterBizImpl" class="com.bdp.adm.biz.impl.ScreenMasterBizImpl"/>
+ 	<bean id="screenMasterDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.ScreenMasterDAO"/>
+ 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- 1.6. TitleName-->
+	<bean id="titleNameBizImpl" class="com.bdp.adm.biz.impl.TitleNameBizImpl"/>
+ 	<bean id="titleNameDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.TitleNameDAO"/>
+ 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- 1.7. ScreenLogin-->
+	<bean id="screenLoginBizImpl" class="com.bdp.adm.biz.impl.ScreenLoginBizImpl"/>
+ 	<bean id="screenLoginDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.ScreenLoginDAO"/>
+ 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- 1.8. DeptName-->
+	<bean id="deptNameBizImpl" class="com.bdp.adm.biz.impl.DeptNameBizImpl"/>
+ 	<bean id="deptNameDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.DeptNameDAO"/>
+ 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- 1.9. StatusName-->
+	<bean id="statusNameBizImpl" class="com.bdp.adm.biz.impl.StatusNameBizImpl"/>
+ 	<bean id="statusNameDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.StatusNameDAO"/>
+ 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- 1.. ScreenArchi-->
+	<bean id="screenArchiBizImpl" class="com.bdp.adm.biz.impl.ScreenArchiBizImpl"/>
+ 	<bean id="screenArchiDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.ScreenArchiDAO"/>
+ 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- 1.. ScreenLink-->
+	<bean id="screenLinkBizImpl" class="com.bdp.adm.biz.impl.ScreenLinkBizImpl"/>
+ 	<bean id="screenLinkDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.ScreenLinkDAO"/>
+ 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	
+ 	<!-- 2. DICTIONARY  -->
+ 	<!-- 2.1. 탁사노미 사전 용 서비스 및 다오-->
+ 	<bean id="taxonomyBizImpl" class="com.bdp.adm.biz.impl.TaxonomyBizImpl"/>
+ 	<bean id="taxonomyDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.TaxonomyDAO"/>
+ 		<property name="sqlSessionFactory" ref="postgreSqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- 감정어 사전 용 서비스 및 다오-->
+ 	<bean id="ewdBizImpl" class="com.bdp.adm.biz.impl.EwdBizImpl" />
+ 	<bean id="ewdDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.EwdDAO" />
+ 		<property name="sqlSessionFactory" ref="postgreSqlSessionFactory" />
+ 	</bean>
+ 	
+ 	<!-- 형태소 사전 용 서비스 및 다오-->
+ 	<bean id="tknDictBizImpl" class="com.bdp.adm.biz.impl.TknDictBizImpl" />
+ 	<bean id="tknDictDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.TknDictDAO" />
+ 		<property name="sqlSessionFactory" ref="postgreSqlSessionFactory" />
+ 	</bean>
+ 	
+ 	<!-- Biz/DAO for DocFilter Table -->
+ 	<bean id="docFilterBizImpl" class="com.bdp.adm.biz.impl.DocFilterBizImpl" />
+ 	<bean id="docFilterDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.DocFilterDAO" />
+ 		<property name="sqlSessionFactory" ref="postgreSqlSessionFactory" />
+ 	</bean>
+ 	
+ 	<!-- Biz/DAO for Stopword Table -->
+ 	<bean id="stopwordBizImpl" class="com.bdp.adm.biz.impl.StopwordBizImpl"/>
+ 	<bean id="stopwordDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.StopwordDAO"/>
+ 		<property name="sqlSessionFactory" ref="postgreSqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- Biz/DAO for CrwalKeywords Table -->
+ 	<bean id="crawlKeywordsBizImpl" class="com.bdp.adm.biz.impl.CrawlKeywordsBizImpl"/>
+ 	<bean id="crawlKeywordsDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.CrawlKeywordsDAO"/>
+ 		<property name="sqlSessionFactory" ref="postgreSqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- Biz/DAO for std.trend_keywords_std_info -->
+ 	<bean id="trendKeywordsBizImpl" class="com.bdp.adm.biz.impl.TrendKeywordsBizImpl"/>
+ 	<bean id="trendKeywordsDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.TrendKeywordsDAO"/>
+ 		<property name="sqlSessionFactory" ref="postgreSqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- Biz/DAO for dictWord Table -->
+ 	<bean id="dictWordBizImpl" class="com.bdp.adm.biz.impl.DictWordBizImpl"/>
+ 	<bean id="dictWordDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.DictWordDAO"/>
+ 		<property name="sqlSessionFactory" ref="postgreSqlSessionFactory"/>
+ 	</bean>
+ 	
+ 	<!-- Biz/DAO for std.trend_keywords_std_info -->
+ 	<bean id="levKeywordsBizImpl" class="com.bdp.adm.biz.impl.LevKeywordsBizImpl"/>
+ 	<bean id="levKeywordsDAO" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.bdp.adm.dao.LevKeywordsDAO"/>
+ 		<property name="sqlSessionFactory" ref="postgreSqlSessionFactory"/>
+ 	</bean>
+</beans>

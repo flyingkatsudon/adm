@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdp.adm.dao.ScreenMasterDAO">
+	<!-- Select Query -->
+	<select id="selectAllScreenMaster" parameterType="map" resultType="com.bdp.adm.vo.ScreenMasterVO">
+		SELECT
+		RESULT.*, r.role_name
+		FROM
+			(
+				SELECT p.*, CONCAT('row_', @Rank := @Rank + 1) as DT_RowId
+				FROM cboard_demo.`MT.Master_Screen_Master` p, (SELECT @Rank := 0) r
+				<if test='!bCode.equals("SY")'>WHERE business_code = #{bCode}</if>
+			) RESULT
+		
+			, cboard_demo.`dashboard_role` as r
+		WHERE
+			RESULT.role_id = r.role_id
+		ORDER BY 
+			<if test="action == null">RESULT.load_date DESC, RESULT.load_time DESC</if>
+			<if test='action != null and action.equals("remove")'>RESULT.update_date DESC, RESULT.update_time DESC</if>
+			<if test='action != null and action.equals("create")'>RESULT.load_date DESC, RESULT.load_time DESC</if>
+			<if test='action != null and action.equals("edit")'>RESULT.update_date DESC, RESULT.update_time DESC</if>	
+	</select>
+	
+	<!-- Select One Query -->
+	<select id="selectOneScreenMaster" parameterType="String" resultType="com.bdp.adm.vo.ScreenMasterVO">
+		SELECT * 
+		FROM (SELECT p.*, CONCAT('row_', @Rank := @Rank + 1) as DT_RowId FROM cboard_demo.`MT.Master_Screen_Master` p, (SELECT @Rank := 0) r WHERE NOT del_cd='X' ORDER BY screen_no ASC, screen_program_id) AS tempTable
+		WHERE DT_RowId=#{DT_RowId}
+	</select>
+	
+	<!-- Insert Query -->
+	<insert id="insertScreenMaster" parameterType="com.bdp.adm.vo.ScreenMasterVO">
+		INSERT INTO cboard_demo.`MT.Master_Screen_Master`(screen_no, screen_program_id, screen_layout_txt, role_id, user_company_cd, load_date, load_time, load_name) 
+		VALUES(#{screenNo}, #{screenProgramId}, #{screenLayoutTxt}, #{roleId}, #{userCompanyCd}, now(), now(), #{loadName})
+	</insert>
+	
+	<!-- Update Query -->
+	<update id="updateScreenMaster" parameterType="com.bdp.adm.vo.ScreenMasterVO">
+		UPDATE
+			cboard_demo.`MT.Master_Screen_Master`
+		SET
+			<if test="screenProgramId != null">screen_program_id=#{screenProgramId},</if>
+			<if test="screenLayoutTxt != null">screen_layout_txt=#{screenLayoutTxt},</if>
+			<if test="roleId != null">role_id=#{roleId},</if>
+			<if test="userCompanyCd != null">user_company_cd=#{userCompanyCd},</if>
+			<if test="delCd != null">del_cd=#{delCd},</if>
+			update_date=now(), update_time=now(), update_name=#{updateName}
+		WHERE
+			screen_no=#{screenNo}
+	</update>
+	
+	<!-- Delete Query -->
+	<delete id="deleteScreenMaster" parameterType="com.bdp.adm.vo.ScreenMasterVO">
+		UPDATE cboard_demo.`MT.Master_Screen_Master`
+		SET del_cd='X', update_date=now(), update_time=now(), update_name=#{updateName}
+		WHERE screen_no=#{screenNo}
+	</delete>
+</mapper>

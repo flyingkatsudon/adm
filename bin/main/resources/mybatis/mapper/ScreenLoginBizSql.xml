@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdp.adm.dao.ScreenLoginDAO">
+	<!-- Select Query -->
+	<select id="selectAllScreenLogin" parameterType="String" resultType="com.bdp.adm.vo.ScreenLoginVO">
+		SELECT p.*, CONCAT('row_', @Rank := @Rank + 1) as DT_RowId
+		FROM cboard_demo.`MT.Transaction_Screen_Login` p, (SELECT @Rank := 0) r
+		<!-- WHERE NOT del_cd = 'X' -->
+		ORDER BY
+			<if test='_parameter == null or _parameter.equals("remove")'>update_date DESC, update_time DESC</if>
+			<if test='_parameter != null and _parameter.equals("create")'>load_date DESC, load_time DESC</if>
+			<if test='_parameter != null and _parameter.equals("edit")'>update_date DESC, update_time DESC</if>
+	</select>
+	
+	<!-- Select One Query -->
+	<select id="selectOneScreenLogin" parameterType="String" resultType="com.bdp.adm.vo.ScreenLoginVO">
+		SELECT * 
+		FROM (SELECT p.*, CONCAT('row_', @Rank := @Rank + 1) as DT_RowId FROM cboard_demo.`MT.Transaction_Screen_Login` p, (SELECT @Rank := 0) r WHERE NOT del_cd='X' ORDER BY screen_no ASC) AS tempTable
+		WHERE DT_RowId=#{DT_RowId}
+	</select>
+	
+	<!-- Insert Query -->
+	<insert id="insertScreenLogin" parameterType="com.bdp.adm.vo.ScreenLoginVO">
+		INSERT INTO cboard_demo.`MT.Transaction_Screen_Login`(screen_no, screen_login_user, screen_login_time, load_date, load_time, load_name, update_date, update_time, update_name) 
+		VALUES(#{screenNo}, #{screenLoginUser}, #{screenLoginTime}, now(), now(), #{loadName}, now(), now(), #{updateName})
+	</insert>
+	
+	<!-- Update Query -->
+	<update id="updateScreenLogin" parameterType="com.bdp.adm.vo.ScreenLoginVO">
+		UPDATE cboard_demo.`MT.Transaction_Screen_Login`
+		SET screen_no=#{screenNo}, screen_login_user=#{screenLoginUser}, screen_login_time=#{screenLoginTime}, del_cd=#{delCd}, update_date=now(), update_time=now(), update_name='temp'
+		WHERE screen_no=#{oldScreenNo}
+	</update>
+	
+	<!-- Delete Query -->
+	<delete id="deleteScreenLogin" parameterType="com.bdp.adm.vo.ScreenLoginVO">
+		UPDATE cboard_demo.`MT.Transaction_Screen_Login`
+		SET del_cd='X', update_date=now(), update_time=now(), update_name=#{updateName}
+		WHERE screen_no=#{screenNo}
+	</delete>
+</mapper>

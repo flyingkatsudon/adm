@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdp.adm.dao.StatusNameDAO">
+	<!-- Select Query -->
+	<select id="selectAllStatusName" parameterType="String" resultType="com.bdp.adm.vo.StatusNameVO">
+		SELECT p.*, CONCAT('row_', @Rank := @Rank + 1) as DT_RowId
+		FROM cboard_demo.`MT.Master_Status_Name_v2` p, (SELECT @Rank := 0) r
+		<!-- WHERE NOT del_cd = 'X' -->
+		ORDER BY
+			<if test='_parameter == null or _parameter.equals("remove")'>update_date DESC, update_time DESC</if>
+			<if test='_parameter != null and _parameter.equals("create")'>load_date DESC, load_time DESC</if>
+			<if test='_parameter != null and _parameter.equals("edit")'>update_date DESC, update_time DESC</if>
+	</select>
+	
+	<!-- Insert Query -->
+	<insert id="insertStatusName" parameterType="com.bdp.adm.vo.StatusNameVO">
+		INSERT INTO cboard_demo.`MT.Master_Status_Name_v2` (user_status_cd, user_status_name, load_date, load_time, load_name) 
+		VALUES(#{userStatusCd}, #{userStatusName}, now(), now(), #{loadName})
+	</insert>
+	
+	<!-- Update Query -->
+	<update id="updateStatusName" parameterType="com.bdp.adm.vo.StatusNameVO">
+		UPDATE
+			cboard_demo.`MT.Master_Status_Name_v2`
+		SET
+		<if test="userStatusCd != null">user_status_cd=#{userStatusCd},</if> 
+		<if test="userStatusName != null">user_status_name=#{userStatusName},</if> 
+		<if test="delCd != null"> del_cd=#{delCd},</if> 
+		update_date=now(), update_time=now(), update_name=#{updateName}
+		WHERE
+			user_status_cd=#{userStatusCd}
+	</update>
+	
+	<!-- Delete Query -->
+	<delete id="deleteStatusName" parameterType="com.bdp.adm.vo.StatusNameVO">
+		UPDATE cboard_demo.`MT.Master_Status_Name_v2`
+		SET del_cd='X', update_date=now(), update_time=now(), update_name=#{updateName}
+		WHERE user_status_cd=#{userStatusCd}
+	</delete>
+</mapper>
